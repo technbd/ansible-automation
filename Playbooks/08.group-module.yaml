@@ -1,0 +1,11 @@
+---
+- name: Create a group
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Create a group 'developers'
+      group:
+        name: developers
+        state: present
+

@@ -1,0 +1,14 @@
+---
+- name: Remove firewalld rule
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Remove port 8080/tcp
+      firewalld:
+        port: 80/tcp
+        #service: http
+        state: disabled
+        permanent: yes
+        immediate: yes
+

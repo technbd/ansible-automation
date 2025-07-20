@@ -1,0 +1,13 @@
+---
+- name: Add firewalld rich rule
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Allow SSH from specific IP using rich rule
+      firewalld:
+        rich_rule: 'rule family="ipv4" source address="192.168.10.44" port protocol="tcp" port="22" accept'
+        state: enabled
+        permanent: yes
+        immediate: yes
+

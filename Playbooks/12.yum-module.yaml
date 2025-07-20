@@ -1,0 +1,11 @@
+---
+- name: Install package using yum
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Install httpd using yum
+      yum:  ## or use 'dnf'
+        name: telnet
+        state: present
+

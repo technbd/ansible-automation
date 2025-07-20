@@ -1,0 +1,13 @@
+---
+- name: Remove firewalld rich rule
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Remove specific rich rule (allow SSH from 192.168.10.44)
+      firewalld:
+        rich_rule: 'rule family="ipv4" source address="192.168.10.44" port protocol="tcp" port="22" accept'
+        state: disabled
+        permanent: yes
+        immediate: yes
+

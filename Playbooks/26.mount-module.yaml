@@ -1,0 +1,21 @@
+---
+- name: Mount Volume
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Create mount directory if not exists
+      file:
+        path: /data
+        state: directory
+        mode: '0755'
+
+    - name: Mount /dev/sdb1 on /data
+      mount:
+        path: /data
+        #src: /dev/sdb1
+        src: /dev/my_vg01/data_lv01
+        fstype: ext4
+        opts: defaults
+        state: mounted
+

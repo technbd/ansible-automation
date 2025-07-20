@@ -1,0 +1,11 @@
+---
+- name: Unmount Partition 
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Unmount and remove entry from /etc/fstab
+      mount:
+        path: /data
+        state: absent  # or use 'unmounted'
+

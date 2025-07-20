@@ -1,0 +1,14 @@
+---
+- name: Install multiple packages
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Install git, vim, wget
+      yum:
+        name:
+          - git
+          - vim
+          - wget
+        state: present
+

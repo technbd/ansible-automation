@@ -1,0 +1,11 @@
+---
+- name: Gather facts demo
+  hosts: node1
+  become: yes
+  gather_facts: true  # default is 'true'
+
+  tasks:
+    - name: Print facts
+      ansible.builtin.debug:
+        var: ansible_facts
+        #msg: "This host is running {{ ansible_distribution }}"

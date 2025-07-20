@@ -1,0 +1,12 @@
+---
+- name: Add user to multiple groups
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Add 'jony' to extra groups
+      user:
+        name: jony
+        groups: developers,devops
+        append: yes
+

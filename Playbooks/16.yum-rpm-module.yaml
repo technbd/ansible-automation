@@ -1,0 +1,17 @@
+---
+- name: Download and install RPM from URL
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Download RPM package
+      get_url:
+        url: https://dl.rockylinux.org/pub/rocky/8/Devel/x86_64/os/Packages/s/screen-4.6.2-4.el8.x86_64.rpm
+        dest: /tmp/custom_package.rpm
+        mode: '0644'
+
+    - name: Install RPM from downloaded file
+      dnf:
+        name: /tmp/custom_package.rpm
+        state: present
+

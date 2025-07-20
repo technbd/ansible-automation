@@ -1,0 +1,13 @@
+---
+- name: Create a user 
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Create user 'john'
+      user:
+        name: john
+        shell: /bin/bash
+        create_home: yes
+        state: present
+

@@ -1,0 +1,16 @@
+---
+- name: File module example playbook
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Delete the file
+      file:
+        path: /opt/demo_dir/empty_file.txt
+        state: absent
+
+    - name: Delete the directory
+      file:
+        path: /opt/demo_dir
+        state: absent       # Deletes the directory (must be empty)
+

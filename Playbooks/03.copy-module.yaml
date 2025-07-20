@@ -1,0 +1,12 @@
+---
+- name: Copy a file to remote host
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Copy hello.txt to /opt directory
+      copy:
+        src: /tmp/hello.txt
+        dest: /opt/hello.txt
+        mode: '0644'
+

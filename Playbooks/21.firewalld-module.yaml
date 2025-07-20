@@ -1,0 +1,13 @@
+---
+- name: Enable HTTP service
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Enable firewalld http service
+      firewalld:
+        service: http
+        state: enabled
+        permanent: yes
+        immediate: yes
+

@@ -1,0 +1,17 @@
+---
+- name: Copy and install RPM package
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Copy RPM to remote host
+      copy:
+        src: /root/screen-4.6.2-4.el8.x86_64.rpm
+        dest: /tmp/custom_package.rpm
+        mode: '0644'
+
+    - name: Install RPM using dnf
+      dnf:
+        name: /tmp/custom_package.rpm
+        state: present
+

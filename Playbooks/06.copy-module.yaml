@@ -1,0 +1,12 @@
+---
+- name: Recursively copy a folder
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Copy local directory to remote host
+      copy:
+        src: /opt
+        dest: /var/www/html
+        mode: '0755'
+

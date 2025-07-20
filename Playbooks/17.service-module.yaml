@@ -1,0 +1,17 @@
+---
+- name: Start and enable a service
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Install httpd (or replace with nginx)
+      yum:
+        name: httpd     # nginx
+        state: present
+
+    - name: Start and enable httpd/nginx service
+      service:
+        name: httpd        # nginx
+        state: started     # or 'restarted' and 'stopped'
+        enabled: yes       # Enables service on boot
+

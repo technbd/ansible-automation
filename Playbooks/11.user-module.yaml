@@ -1,0 +1,17 @@
+---
+- name: Remove user and group
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Remove user 'jony'
+      user:
+        name: jony
+        state: absent
+        remove: yes
+
+    - name: Remove group 'devops'
+      group:
+        name: devops
+        state: absent
+

@@ -1,0 +1,14 @@
+---
+- name: Create user and add to group
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Create user 'jon' and add to 'developers' group
+      user:
+        name: jon
+        group: developers
+        shell: /bin/bash
+        create_home: yes
+        state: present
+

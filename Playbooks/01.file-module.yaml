@@ -1,0 +1,23 @@
+---
+- name: File module example playbook
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Create a directory
+      file:
+        path: /opt/demo_dir
+        state: directory
+        mode: '0755'
+
+    - name: Create an empty file
+      file:
+        path: /opt/demo_dir/empty_file.txt
+        state: touch
+        mode: '0644'
+
+    - name: Set file owner and group
+      file:
+        path: /opt/demo_dir/empty_file.txt
+        owner: root
+        group: root

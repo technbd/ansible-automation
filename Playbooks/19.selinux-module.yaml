@@ -1,0 +1,11 @@
+---
+- name: Disable SELinux
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Disable SELinux permanently
+      selinux:
+        state: disabled   # permissive, enforcing
+        policy: targeted  # Usually targeted (default on RHEL)
+

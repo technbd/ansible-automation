@@ -1,0 +1,9 @@
+---
+- name: Reload firewalld 
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Reload firewalld
+      command: firewall-cmd --reload
+

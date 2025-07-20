@@ -1,0 +1,11 @@
+---
+- name: Remove a package
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Remove telnet
+      yum:
+        name: telnet
+        state: absent
+

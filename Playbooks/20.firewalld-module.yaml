@@ -1,0 +1,13 @@
+---
+- name: Open HTTP port using firewalld
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Open port 80/tcp permanently and immediately
+      firewalld:
+        port: 80/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+

@@ -1,0 +1,12 @@
+---
+- name: Copy inline content to a file
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Write message to file
+      copy:
+        content: "This is a test file created by Ansible.\nHello World!"
+        dest: /opt/test_message.txt
+        mode: '0644'
+

@@ -1,0 +1,17 @@
+---
+- name: Stop and disable a service
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Stop httpd service
+      service:
+        name: httpd
+        state: stopped     # Immediately stops the service
+
+    - name: Disable httpd at boot
+      service:
+        name: httpd
+        enabled: no        # Prevents it from starting on boot
+
+

@@ -1,0 +1,14 @@
+---
+- name: Copy file with ownership and permissions
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Copy a script and make it executable by root
+      copy:
+        src: /tmp/script.sh
+        dest: /opt/script.sh
+        owner: root
+        group: root
+        mode: '0755'
+
