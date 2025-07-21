@@ -1,0 +1,11 @@
+---
+- name: Add a line 
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Add a line on hosts file 
+      lineinfile:
+        path: /etc/hosts
+        line: '192.168.10.194 node4'
+

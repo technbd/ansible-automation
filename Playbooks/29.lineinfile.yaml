@@ -1,0 +1,13 @@
+---
+- name: Remove a line 
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Remove a line on hosts file 
+      lineinfile:
+        path: /etc/hosts
+        #regexp: '^debug=true'
+        regexp: '^192.168.10.194 node4'
+        state: absent
+

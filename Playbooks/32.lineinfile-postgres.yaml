@@ -1,0 +1,19 @@
+---
+- name: Update PostgreSQL Configuration
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Ensure PostgreSQL listening on '*'
+      lineinfile:
+        path: /var/lib/pgsql/16/data/postgresql.conf
+        regexp: '^#?listen_addresses\s*='
+        line: "listen_addresses = '*'"
+        state: present
+        backup: yes
+
+    - name: Restart PostgreSQL service
+      service:
+        name: postgresql-16
+        state: restarted
+

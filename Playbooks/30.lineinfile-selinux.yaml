@@ -1,0 +1,11 @@
+- name: Update selinux
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: dislable selinux
+      lineinfile:
+        path: /etc/selinux/config
+        regexp: '^SELINUX='
+        line: 'SELINUX=disabled'
+

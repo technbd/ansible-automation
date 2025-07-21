@@ -1,0 +1,19 @@
+---
+- name: Update SSH Configuration
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Change SSH Port to 2222
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?Port\s+'
+        line: 'Port 2222'
+        state: present
+        backup: yes
+
+    - name: Restart SSH service
+      service:
+        name: sshd
+        state: restarted
+

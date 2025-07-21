@@ -708,6 +708,149 @@ Make sure `firewalld` is installed and running on your managed hosts:
 
 
 
+### `lineinfile` Modules Playbook:
+
+
+#### Add a line if it doesn't exist: 
+
+This ensures the line `'192.168.10.194 node4'` exists in `/etc/hosts`. It will **add it if it's not there**, or do nothing if it already is.
+
+```
+---
+- name: Add a line 
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Add a line on hosts file 
+      lineinfile:
+        path: /etc/hosts
+        line: '192.168.10.194 node4'
+```
+
+
+#### Remove a line: 
+
+This removes any line matching `debug=true`.
+
+```
+---
+- name: Remove a line
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Remove a line on hosts file
+      lineinfile:
+        path: /etc/hosts
+        #regexp: '^debug=true'
+        regexp: '^192.168.10.194 node4'
+        state: absent
+```
+
+
+
+
+#### Replace a line matching a pattern: 
+
+1. Playbook: 
+```
+---
+- name: Update configuration
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Update on hosts file
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^192.168.10.194 node4'
+        line: '192.168.10.194 node5'
+```
+
+
+2. Playbook: Update selinux Configuration
+
+```
+---
+- name: Update selinux
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: dislable selinux
+      lineinfile:
+        path: /etc/selinux/config
+        regexp: '^SELINUX='
+        line: 'SELINUX=disabled'
+```
+
+
+
+
+
+#### Uncomment and update a config line:
+
+
+1. Playbook: SSH Port Change: 
+
+- `regexp: '^#?Port\s+'` — This matches both `Port` and `#Port`.
+- `line: 'Port 2222'` — This enforces the desired line.
+- `backup: yes` — Makes a backup of the original file before editing.
+
+
+```
+---
+- name: Update SSH Configuration
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Change SSH Port to 2222
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?Port\s+'
+        line: 'Port 2222'
+        state: present
+        backup: yes
+
+    - name: Restart SSH service
+      service:
+        name: sshd
+        state: restarted
+```
+
+
+
+2. Playbook: PostgreSQL listening on '*': 
+
+This replaces `#listen_addresses = 'localhost'` or `listen_addresses = 'localhost'` with `listen_addresses = '*'`.
+
+```
+---
+- name: Update PostgreSQL Configuration
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Ensure PostgreSQL listening on '*'
+      lineinfile:
+        path: /var/lib/pgsql/16/data/postgresql.conf
+        regexp: '^#?listen_addresses\s*='
+        line: "listen_addresses = '*'"
+        state: present
+        backup: yes
+
+    - name: Restart PostgreSQL service
+      service:
+        name: postgresql-16
+        state: restarted
+```
+
+
+
+
+
 
 An Ansible Playbook is a simple yet powerful tool to automate IT tasks such as software installation, configuration management, service control, user management, and more.
 
