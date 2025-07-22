@@ -849,6 +849,132 @@ This replaces `#listen_addresses = 'localhost'` or `listen_addresses = 'localhos
 
 
 
+### Ansible loop: 
+
+The `loop` keyword allows you to **run a task multiple times**, once for each item in a list. It's a replacement for the older `with_items` syntax and is more readable and flexible.
+
+
+- `item` is the **default variable name** in Ansible's `loop`. So, item is not mandatory, but it is the default 
+- `{{ item }}` :	Jinja2 syntax to interpolate the loop variable in the task.
+- It executes the task once with `item` substituted into the `path` or `name` field.
+
+
+#### Create Multiple Files with Loop:
+
+```
+---
+- name: Loop - Create Multiple Files
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Create multiple files
+      file:
+        path: "/opt/{{ item }}"
+        state: touch
+      loop:
+        - file1.txt
+        - file2.txt
+        - file3.txt
+```
+
+
+
+
+#### Install Multiple Packages: 
+
+```
+---
+- name: Install multiple packages using loop
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Install packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - vim
+        - git
+        - curl
+```
+
+
+
+#### Create Multiple Users: 
+
+```
+---
+- name: Create users using loop
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Create users
+      user:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - alice
+        - bob
+        - carol
+```
+
+
+
+#### With Dictionary (key-value): 
+
+_Loop-1: Create Multiple Users:_
+```
+---
+- name: Add users with extra attributes
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Add users with shell
+      user:
+        name: "{{ item.name }}"
+        shell: "{{ item.shell }}"
+      loop:
+        - { name: ron, shell: /bin/bash }
+        - { name: jane, shell: /sbin/nologin }
+
+```
+
+
+
+_Loop-2: Download Multiple files using url:_
+```
+---
+- name: Download MySQL GPG keys using loop
+  hosts: node1
+  become: true
+
+  tasks:
+    - name: Download MySQL GPG keys (2022 and 2023)
+      get_url:
+        url: "{{ item.url }}"
+        dest: "{{ item.dest }}"
+        mode: '0644'
+      loop:
+        - { url: "https://repo.mysql.com/RPM-GPG-KEY-mysql",         dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-mysql" }
+        - { url: "https://repo.mysql.com/RPM-GPG-KEY-mysql-2022",    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-mysql-2022" }
+        - { url: "https://repo.mysql.com/RPM-GPG-KEY-mysql-2023",    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-mysql-2023" }
+
+    - name: Import MySQL GPG keys
+      rpm_key:
+        key: "{{ item }}"
+        state: present
+      loop:
+        - /etc/pki/rpm-gpg/RPM-GPG-KEY-mysql
+        - /etc/pki/rpm-gpg/RPM-GPG-KEY-mysql-2022
+        - /etc/pki/rpm-gpg/RPM-GPG-KEY-mysql-2023
+
+```
+
+
 
 
 

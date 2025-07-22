@@ -1,0 +1,14 @@
+---
+- name: Create users using loop
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Create users
+      user:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - alice
+        - bob
+        - carol
