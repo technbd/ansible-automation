@@ -1,0 +1,15 @@
+---
+- name: Run multiple shell commands
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Run multiple commands in one shell task
+      shell: |
+        echo "Starting updates..."
+        yum update -y
+        echo "Cleaning cache..."
+        yum clean all
+        echo "Done!"
+      args:
+        executable: /bin/bash

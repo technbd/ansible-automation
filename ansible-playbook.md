@@ -977,6 +977,99 @@ _Loop-2: Download Multiple files using url:_
 
 
 
+### `shell` Modules Playbook:  
+
+In Ansible (and YAML in general), `|` and `>` are used to define **multi-line strings**, but they behave differently:
+
+
+#### Run multiple `shell` commands:
+
+- Use `|` to write multiple lines under `shell`.
+- Commands run in order, as a single shell script.
+- Use `args: executable: /bin/bash` to specify bash shell (optional but common).
+
+
+```
+---
+- name: Run multiple shell commands example
+  hosts: node1
+  become: yes
+
+  tasks:
+    - name: Run multiple commands in one shell task
+      shell: |
+        echo "Starting updates..."
+        yum update -y
+        echo "Cleaning cache..."
+        yum clean all
+        echo "Done!"
+      args:
+        executable: /bin/bash
+```
+
+
+
+#### `|` (Literal Block Scalar):
+
+- **Preserves line breaks exactly as written**.
+- Each new line in YAML becomes a **real new line** in the string.
+
+```
+shell: |
+  echo "Start"
+  echo "Next line"
+```
+
+
+This results in:
+```
+echo "Start"
+echo "Next line"
+```
+
+
+
+#### `>` (Folded Block Scalar): 
+
+- **Joins all lines into a single line**, replacing newlines with `spaces` unless you add `\n`.
+- Useful when writing a **long command split** over lines in YAML.
+
+```
+shell: >
+  echo "Start"
+  echo "Next line"
+```
+
+
+This results in:
+```
+echo "Start" echo "Next line"
+```
+
+
+#### Example:
+
+That’s the correct use — > is **joining the full command into one line** while allowing YAML readability.
+
+```
+shell: >
+  mysql --connect-expired-password -uroot -p'{{ mysql_temp_pass.stdout }}'
+  -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_root_password }}';"
+```
+
+
+Which becomes:
+```
+mysql --connect-expired-password -uroot -p'...password...' -e "ALTER USER ...;"
+```
+
+
+
+
+
+
+
+
 
 An Ansible Playbook is a simple yet powerful tool to automate IT tasks such as software installation, configuration management, service control, user management, and more.
 
