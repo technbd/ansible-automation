@@ -1,0 +1,70 @@
+---
+- name: Install and Configure PostgreSQL on Rocky Linux 8
+  hosts: node1
+  become: yes
+
+  vars:
+    pg_version: 16
+
+  tasks:
+    - name: Download PostgreSQL official YUM repository RPM
+      get_url:
+        url: https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+        dest: /tmp/pgdg-redhat-repo-latest.noarch.rpm
+
+    - name: Install PostgreSQL YUM repository RPM
+      yum:
+        name: /tmp/pgdg-redhat-repo-latest.noarch.rpm
+        state: present
+
+#    - name: Download PG GPG keys
+#      get_url:
+#        url:
+#        dest:
+#        mode: '0644'
+
+    - name: Import PostgreSQL GPG key
+      rpm_key:
+        #key: https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG
+        key: /etc/pki/rpm-gpg/PGDG-RPM-GPG-KEY-RHEL
+        state: present
+
+    - name: Install yum-utils
+      yum:
+        name: yum-utils
+        state: present
+
+    - name: Disable built-in PostgreSQL DNF module
+      command: dnf -qy module disable postgresql
+      args:
+        creates: /etc/dnf/modules.d/postgresql.module
+
+    - name: Enable PostgreSQL {{ pg_version }} repo explicitly
+      command: dnf config-manager --set-enabled pgdg{{ pg_version }}
+
+    - name: Install PostgreSQL {{ pg_version }} server, client, and psycopg2
+      yum:
+        name:
+          - postgresql{{ pg_version }}
+          - postgresql{{ pg_version }}-server
+          - python3-psycopg2
+        state: present
+
+    - name: Initialize PostgreSQL database
+      command: /usr/pgsql-{{ pg_version }}/bin/postgresql-{{ pg_version }}-setup initdb
+      args:
+        creates: /var/lib/pgsql/{{ pg_version }}/data/PG_VERSION
+
+    - name: Configure PostgreSQL to listen on all interfaces
+      lineinfile:
+        path: /var/lib/pgsql/{{ pg_version }}/data/postgresql.conf
+        regexp: '^#?listen_addresses\s*='
+        line: "listen_addresses = '*'"
+        state: present
+
+    - name: Enable and start PostgreSQL service
+      service:
+        name: postgresql-{{ pg_version }}
+        state: started
+        enabled: yes
+
