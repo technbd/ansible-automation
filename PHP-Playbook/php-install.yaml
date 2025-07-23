@@ -1,0 +1,94 @@
+---
+- name: Install and Configure PHP on Rocky Linux 8.8
+  hosts: node1
+  become: true
+
+  vars:
+    php_version: 7.4
+
+  tasks:
+    - name: Install EPEL repository
+      yum:
+        name: epel-release
+        state: present
+
+    - name: Download Remi repository RPM
+      get_url:
+        url: https://rpms.remirepo.net/enterprise/remi-release-8.rpm
+        dest: /tmp/remi-release-8.rpm
+
+    - name: Download Remi GPG keys
+      get_url:
+        url: "{{ item.url }}"
+        dest: "{{ item.dest }}"
+        mode: '0644'
+      loop:
+        - { url: "https://rpms.remirepo.net/RPM-GPG-KEY-remi",        dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-remi" }
+        - { url: "https://rpms.remirepo.net/RPM-GPG-KEY-remi2017",    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-remi2017" }
+        - { url: "https://rpms.remirepo.net/RPM-GPG-KEY-remi2018",    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-remi2018" }
+        - { url: "https://rpms.remirepo.net/RPM-GPG-KEY-remi2019",    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-remi2019" }
+        - { url: "https://rpms.remirepo.net/RPM-GPG-KEY-remi2020",    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-remi2020" }
+        - { url: "https://rpms.remirepo.net/RPM-GPG-KEY-remi2021",    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-remi2021" }
+        - { url: "https://rpms.remirepo.net/RPM-GPG-KEY-remi2022",    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-remi2022" }
+        - { url: "https://rpms.remirepo.net/RPM-GPG-KEY-remi2023",    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-remi2023" }
+        - { url: "https://rpms.remirepo.net/RPM-GPG-KEY-remi2024",    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-remi2024" }
+        - { url: "https://rpms.remirepo.net/RPM-GPG-KEY-remi2025",    dest: "/etc/pki/rpm-gpg/RPM-GPG-KEY-remi2025" }
+
+    - name: Import Remi GPG keys
+      rpm_key:
+        key: "{{ item }}"
+        state: present
+      loop:
+        - /etc/pki/rpm-gpg/RPM-GPG-KEY-remi
+        - /etc/pki/rpm-gpg/RPM-GPG-KEY-remi2017
+        - /etc/pki/rpm-gpg/RPM-GPG-KEY-remi2018
+        - /etc/pki/rpm-gpg/RPM-GPG-KEY-remi2019
+        - /etc/pki/rpm-gpg/RPM-GPG-KEY-remi2020
+        - /etc/pki/rpm-gpg/RPM-GPG-KEY-remi2021
+        - /etc/pki/rpm-gpg/RPM-GPG-KEY-remi2022
+        - /etc/pki/rpm-gpg/RPM-GPG-KEY-remi2023
+        - /etc/pki/rpm-gpg/RPM-GPG-KEY-remi2024
+        - /etc/pki/rpm-gpg/RPM-GPG-KEY-remi2025
+
+    - name: Install Remi repository
+      yum:
+        name: /tmp/remi-release-8.rpm
+        state: present
+
+    - name: Disable built-in PHP module
+      command: dnf -qy module disable php
+      args:
+        creates: /etc/dnf/modules.d/php.module
+
+    - name: Enable PHP {{ php_version }} module from Remi
+      command: "dnf -y module enable php:remi-{{ php_version }}"
+      args:
+        creates: "/etc/dnf/modules.d/php:remi-{{ php_version }}.module"
+
+    - name: Install PHP {{ php_version }} and common extensions
+      yum:
+        name:
+          - php
+          - php-cli
+          - php-common
+          - php-mysqlnd
+          - php-pdo
+          - php-gd
+          - php-mbstring
+          - php-xml
+          - php-curl
+          - php-zip
+          #- php-devel
+          - php-bcmath
+          - php-fpm
+        state: present
+
+    - name: Verify PHP version
+      command: php -v
+      register: php_version_output
+      changed_when: false
+
+    - name: Show installed PHP version
+      debug:
+        msg: "{{ php_version_output.stdout_lines }}"
+
