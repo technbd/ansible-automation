@@ -1,0 +1,15 @@
+---
+- name: Install selected packages
+  hosts: node1
+  become: true
+
+  tasks:
+    - name: Install packages except postfix
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - httpd
+        - telnet
+        - postfix
+      when: item != 'postfix'

@@ -1,0 +1,14 @@
+---
+- name: Conditional Apache Installation
+  hosts: node1
+  become: true
+
+  vars:
+    install_httpd: true   # Change to 'false' or 'true' to skip installation
+
+  tasks:
+    - name: Install package if enabled
+      yum:
+        name: httpd
+        state: present
+      when: install_httpd | bool

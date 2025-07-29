@@ -1124,6 +1124,144 @@ The `register` keyword in Ansible is used to capture the result of a task into a
 
 
 
+### `when` keyword in Ansible: 
+
+The `when` keyword is used in Ansible **playbooks** to define **conditions** that control whether a task or role should run. It helps you **skip or execute** tasks based on **variables**, **facts**, or **expressions**. `when` is used as a conditional statement to run a task only when a specific condition is true.
+
+
+#### Syntax:
+```
+- name: Your task name
+  command: some_command
+  when: condition
+```
+
+
+#### Run a task only if the OS is Rocky Linux:
+
+- `when:` : A conditional. The task will only run if the OS distribution is "**Rocky**".
+- `ansible_facts['distribution']` :	This fact is automatically gathered by Ansible and contains the OS name (e.g., `Rocky`, `CentOS`, `Ubuntu`).
+
+
+```
+---
+- name: Conditional Apache Installation
+  hosts: node1
+  become: true
+
+  tasks:
+    - name: Check OS distribution and version
+      debug:
+        msg: "Distribution is: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }}"
+
+    - name: Run only on Rocky Linux
+      shell: echo "Running on Rocky Linux"
+      when: ansible_facts['distribution'] == "Rocky"
+```
+
+
+#### Based on variable value:
+
+This task checks the value of the variable `install_httpd`:
+- If `install_httpd`: true, it installs Apache (httpd).
+- If `install_httpd`: false (or not set), the task is skipped.
+
+
+#### Example Values and Behavior:
+
+| install_httpd value | Result after | bool | Task runs? |
+|---------------------|--------------|------|------------|
+| true | true | ✅ Yes |
+| "true" | true | ✅ Yes |
+| false | false | ❌ No |
+| "no" | false | ❌ No |
+| Not defined | false | ❌ No |
+
+
+
+```
+---
+- name: Conditional Apache Installation
+  hosts: node1
+  become: true
+
+  vars:
+    install_httpd: true   # Change to 'false' to skip installation
+
+  tasks:
+    - name: Install package if enabled
+      yum:
+        name: httpd
+        state: present
+      when: install_httpd | bool
+```
+
+
+#### Using when in a loop:
+
+This task is a great example of using `when` inside a loop to conditionally skip certain items!
+
+- Loops over the list of packages: `httpd`, `telnet`, `postfix`.
+- For each package (`item`):
+  - Installs the package using the `yum` module.
+  - But only if the package name is NOT `postfix` (because of `when: item != 'postfix'`).
+- So, this task installs `httpd` and `telnet` but skips `postfix`.
+
+
+```
+---
+- name: Install selected packages
+  hosts: node1
+  become: true
+
+  tasks: 
+    - name: Install packages except postfix
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - httpd
+        - telnet
+        - postfix
+      when: item != 'postfix'
+```
+
+
+
+#### Multiple conditions with `AND` / `OR`: 
+
+- Install Apache (`httpd`) on node1.
+- Restart the service **only if**: The variable `enable_httpd` is `true` and the OS is **Rocky**.
+
+
+
+```
+---
+- name: Install and optionally restart Apache
+  hosts: node1
+  become: true
+
+  vars:
+    enable_httpd: true    # Set this to 'false' to skip service restart
+
+  tasks: 
+    - name: Install httpd package 
+      yum:
+        name: httpd
+        state: present
+
+    - name: Restart httpd service if enabled and on Rocky Linux
+      service:
+        name: httpd
+        state: restarted
+      when: enable_httpd and ansible_facts['distribution'] == "Rocky"
+
+```
+
+
+
+
+
 
 
 An Ansible Playbook is a simple yet powerful tool to automate IT tasks such as software installation, configuration management, service control, user management, and more.

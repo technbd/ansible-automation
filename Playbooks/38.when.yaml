@@ -1,0 +1,13 @@
+---
+- name: Conditional Apache Installation
+  hosts: node1
+  become: true
+
+  tasks:
+    - name: Check OS distribution and version
+      debug:
+              msg: "Distribution is: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }}"
+
+    - name: Run only on Rocky Linux
+      shell: echo "Running on Rocky Linux"
+      when: ansible_facts['distribution'] == "Rocky"

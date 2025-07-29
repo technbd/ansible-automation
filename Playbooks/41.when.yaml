@@ -1,0 +1,19 @@
+---
+- name: Install and optionally restart Apache
+  hosts: node1
+  become: true
+
+  vars:
+    enable_httpd: true    # Set this to 'false' to skip service restart
+
+  tasks:
+    - name: Install httpd package
+      yum:
+        name: httpd
+        state: present
+
+    - name: Restart httpd service if enabled and on Rocky Linux
+      service:
+        name: httpd
+        state: restarted
+      when: enable_httpd and ansible_facts['distribution'] == "Rocky"
