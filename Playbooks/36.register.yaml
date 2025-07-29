@@ -1,0 +1,14 @@
+---
+- name: Example of using register in Ansible
+  hosts: node1
+  become: true
+
+  tasks:
+    - name: Run uptime command
+      command: uptime
+      register: result
+
+    - name: Show uptime result
+      debug:
+        var: result.stdout
+

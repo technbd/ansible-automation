@@ -1066,6 +1066,61 @@ mysql --connect-expired-password -uroot -p'...password...' -e "ALTER USER ...;"
 
 
 
+### `register` keyword in Ansible: 
+
+The `register` keyword in Ansible is used to capture the result of a task into a variable. You can later use this registered variable in conditional statements (when), debug output, or for further processing in other tasks.
+
+
+
+#### `var: result.stdout`
+
+- **Purpose**: Directly prints the value of the variable.
+- **Output style**: Structured output with key-value format.
+- **Use case**: When you want to inspect or debug a variable cleanly.
+
+
+```
+---
+- name: Example of using register in Ansible
+  hosts: node1
+  become: true
+
+  tasks:
+    - name: Run uptime command
+      command: uptime
+      register: result
+
+    - name: Show uptime result
+      debug:
+        var: result.stdout
+```
+
+
+
+#### `msg: "The hostname is: {{ hostname_output.stdout }}"`
+
+- **Purpose**: Custom message with embedded variable.
+- **Output style**: Human-friendly text.
+- **Use case**: When you want to display a formatted message.
+
+
+```
+---
+- name: Example of using register in Ansible
+  hosts: node1
+  become: true
+
+  tasks:
+    - name: Run a shell command and register output
+      shell: "hostname"
+      register: hostname_output
+
+    - name: Show hostname
+      debug:
+        msg: "The hostname is: {{ hostname_output.stdout }}"
+```
+
+
 
 
 

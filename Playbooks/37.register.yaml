@@ -1,0 +1,14 @@
+---
+- name: Example of using register in Ansible
+  hosts: node1
+  become: true
+
+  tasks:
+    - name: Run a shell command and register output
+      shell: "hostname"
+      register: hostname_output
+
+    - name: Show hostname
+      debug:
+        msg: "The hostname is: {{ hostname_output.stdout }}"
+
