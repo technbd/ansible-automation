@@ -1,0 +1,65 @@
+---
+- name: Install and Configure MongoDB 8.0 on Rocky Linux 8
+  hosts: node1
+  become: true
+
+  vars:
+    mongo_repo_file: /etc/yum.repos.d/mongodb-org-8.0.repo
+    mongo_repo_content: |
+      [mongodb-org-8.0]
+      name=MongoDB Repository
+      baseurl=https://repo.mongodb.org/yum/redhat/8/mongodb-org/8.0/x86_64/
+      gpgcheck=1
+      enabled=1
+      gpgkey=https://pgp.mongodb.com/server-8.0.asc
+    mongo_port: 27017
+    bind_ip: 0.0.0.0  # Change to 127.0.0.1 for local access only
+
+  tasks:
+    - name: Create MongoDB 8.0 repository file
+      copy:
+        dest: "{{ mongo_repo_file }}"
+        content: "{{ mongo_repo_content }}"
+        mode: '0644'
+
+    - name: Install MongoDB 8.0
+      yum:
+        name: mongodb-org
+        state: present
+
+    - name: Enable MongoDB to start on boot
+      systemd:
+        name: mongod
+        enabled: true
+
+    - name: Update mongod.conf to listen on all interfaces
+      lineinfile:
+        path: /etc/mongod.conf
+        regexp: '^  bindIp:'
+        line: "  bindIp: {{ bind_ip }}"
+        insertafter: '^net:'
+        backrefs: yes
+
+    - name: Start MongoDB service
+      systemd:
+        name: mongod
+        state: started
+
+    - name: Verify MongoDB is running
+      shell: "systemctl is-active mongod"
+      register: mongo_status
+      changed_when: false
+
+    - name: Show MongoDB status
+      debug:
+        msg: "MongoDB status is: {{ mongo_status.stdout }}"
+
+    - name: MongoDB version
+      command: mongod --version
+      register: mongod_version
+      changed_when: false
+
+    - name: Show MongoDB version
+      debug:
+        msg: "{{ mongod_version.stdout_lines }}"
+
